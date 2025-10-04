@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fake News Filter – Options</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Fake News Filter – Settings</h1>
+
+      <section>
+        <h2>External Fact-Check (Opt-in)</h2>
+        <label class="row">
+          <input type="checkbox" id="optIn" /> Enable Snopes fact-check lookups (privacy-friendly; sends paraphrased headline/claim only)
+        </label>
+        <label class="row">
+          Snopes API Key
+          <input type="password" id="apiKey" placeholder="Enter API key" />
+        </label>
+        <label class="row">
+          Snopes API Base URL
+          <input type="text" id="apiBase" placeholder="https://api.snopes.com/fact-check" />
+        </label>
+        <div class="hint">We never send full article text. We paraphrase key claims. Data is cached locally to reduce requests.</div>
+        <div class="actions">
+          <button id="save">Save</button>
+          <span id="status" class="status"></span>
+        </div>
+      </section>
+
+      <section>
+        <h2>Privacy</h2>
+        <p>By default, all analysis runs locally. External lookups happen only if you opt in above.</p>
+      </section>
+    </main>
+    <script type="module" src="options.js"></script>
+  </body>
+</html>

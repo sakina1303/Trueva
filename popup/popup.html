@@ -18,20 +18,39 @@
     </section>
 
     <section id="results" class="hidden">
+      <div id="offline" class="offline hidden">Offline Mode — using local heuristics</div>
       <div class="score-row">
         <div>
           <span class="label">Authenticity Score</span>
           <span id="score" class="score">--%</span>
         </div>
-        <div>
+        <div class="bias-wrap">
           <span class="label">Bias</span>
+          <div id="biasMeter" class="bias-meter" title="Bias indicator">
+            <div id="biasPointer" class="bias-pointer"></div>
+          </div>
           <span id="bias" class="bias">--</span>
+          <span id="biasConf" class="bias-conf">(–)</span>
         </div>
       </div>
       <div id="flags" class="flags"></div>
-      <div id="highlightsPanel" class="panel"></div>
-      <div id="sources" class="panel"></div>
-      <div id="explainability" class="panel"></div>
+      <details class="panel" open>
+        <summary>Flagged Claims</summary>
+        <div id="highlightsPanel"></div>
+      </details>
+      <details class="panel" open>
+        <summary>Suggested Sources</summary>
+        <div id="sources"></div>
+      </details>
+      <details class="panel" open>
+        <summary>Explainability</summary>
+        <div id="explainability"></div>
+      </details>
+      <div class="feedback">
+        <button id="agreeBtn" class="small">Agree</button>
+        <button id="disagreeBtn" class="small">Disagree</button>
+        <span id="community" class="community"></span>
+      </div>
     </section>
 
     <footer>

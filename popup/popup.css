@@ -24,3 +24,27 @@ footer { display: flex; justify-content: space-between; padding: 8px 12px; borde
 .score.green { color: #15803d; }
 .score.yellow { color: #a16207; }
 .score.red { color: #b91c1c; }
+
+/* Offline */
+.offline { background: #fff7ed; color: #9a3412; border: 1px solid #fed7aa; padding: 6px 8px; border-radius: 8px; margin: 6px 0; font-size: 12px; }
+
+/* Bias meter */
+.bias-wrap { display: flex; align-items: center; gap: 6px; }
+.bias-meter { position: relative; width: 140px; height: 8px; background: linear-gradient(90deg, #60a5fa, #9ca3af, #f59e0b); border-radius: 999px; overflow: hidden; border: 1px solid #e5e7eb; }
+.bias-pointer { position: absolute; top: -4px; width: 2px; height: 16px; background: #111; left: 50%; transition: left 0.25s ease; }
+.bias-conf { color: #6b7280; font-size: 12px; }
+
+/* Details */
+details.panel { padding-top: 4px; }
+details.panel > summary { cursor: pointer; list-style: none; font-weight: 600; font-size: 13px; }
+details.panel > summary::-webkit-details-marker { display: none; }
+
+/* Feedback */
+.feedback { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.small { padding: 4px 8px; border-radius: 6px; border: 1px solid #e5e7eb; background: #f9fafb; font-size: 12px; cursor: pointer; }
+.community { color: #6b7280; font-size: 12px; }
+
+@media (max-width: 360px) {
+  body { width: 320px; }
+  .bias-meter { width: 120px; }
+}

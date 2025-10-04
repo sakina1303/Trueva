@@ -6,7 +6,8 @@
   "permissions": [
     "activeTab",
     "scripting",
-    "storage"
+    "storage",
+    "tabs"
   ],
   "host_permissions": [
     "http://*/*",
@@ -20,6 +21,7 @@
     "service_worker": "background/service-worker.js",
     "type": "module"
   },
+  "options_page": "options/options.html",
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],

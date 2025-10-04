@@ -1,2 +1,7 @@
-.fnf-highlight { background: linear-gradient(transparent 60%, rgba(251, 191, 36, 0.6) 60%); padding: 0 0.1em; }
-.fnf-hide-highlights .fnf-highlight { background: transparent !important; }
+.fnf-highlight { padding: 0 0.1em; }
+.fnf-hide-highlights .fnf-highlight { background: transparent !important; box-shadow: none !important; }
+
+/* Color coding */
+.fnf-highlight.fnf-red { background: linear-gradient(transparent 60%, rgba(239,68,68,0.6) 60%); }
+.fnf-highlight.fnf-yellow { background: linear-gradient(transparent 60%, rgba(251,191,36,0.6) 60%); }
+.fnf-highlight.fnf-blue { background: linear-gradient(transparent 60%, rgba(59,130,246,0.5) 60%); }

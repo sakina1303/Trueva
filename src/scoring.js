@@ -11,3 +11,8 @@ export function detectBias(text) {
   score = Math.max(0, Math.min(100, score));
   return { label, score };
 }
+
+export function lexicalBias(text) {
+  const res = detectBias(text);
+  return { score: res.score, label: res.label, confidence: 0.5 };
+}

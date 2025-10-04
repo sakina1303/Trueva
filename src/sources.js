@@ -25,17 +25,67 @@ export function makeSearchQueries(text) {
   ];
 }
 
-export function suggestSources({ text, url, title, flags }) {
-  // Local suggestion heuristic: we cannot fetch; propose reputable sources and paraphrased queries
-  const kws = extractKeywords(title || text).slice(0,4).join(' ');
-  const suggestions = AUTH_SOURCES.slice(0,3).map(s => ({
-    title: `${s.title} coverage related to: ${kws || 'topic'}`,
-    url: s.base,
-    reliability_score: 80 + s.bonus / 3,
-    reason: 'Authoritative outlet; encourages cross-corroboration; HTTPS and transparent masthead',
-    evidence_snippet: null,
-    type: 'secondary'
-  }));
+export function suggestSources({ text, url, title, flags, entities = {} }) {
+  // Generate site search links with paraphrased keywords and entities
+  const baseKws = extractKeywords(title || text);
+  const entityKws = (entities.keywords || []).slice(0,4);
+  const mix = Array.from(new Set([...entityKws, ...baseKws])).slice(0,4);
+  const q = encodeURIComponent(mix.join(' '));
+  const suggestions = [
+    {
+      title: `Reuters coverage: ${mix.slice(0,3).join(' ') || 'topic'}`,
+      url: `https://www.reuters.com/site-search/?query=${q}`,
+      reliability_score: 90,
+      reason: 'High-authority newsroom; HTTPS; transparent masthead; corroborates with primary sources',
+      evidence_snippet: null,
+      type: 'secondary'
+    },
+    {
+      title: `AP News coverage: ${mix.slice(0,3).join(' ') || 'topic'}`,
+      url: `https://apnews.com/search?q=${q}`,
+      reliability_score: 90,
+      reason: 'Authoritative wire service; cites primary statements; HTTPS',
+      evidence_snippet: null,
+      type: 'secondary'
+    },
+    {
+      title: `Snopes fact checks: ${mix.slice(0,3).join(' ') || 'topic'}`,
+      url: `https://www.snopes.com/search/?q=${q}`,
+      reliability_score: 92,
+      reason: 'Recognized fact-checker; links to primary evidence; HTTPS',
+      evidence_snippet: null,
+      type: 'secondary'
+    }
+  ];
+  const topics = new Set(entities.topics || []);
+  if (topics.has('politics')) {
+    suggestions.push({
+      title: `PolitiFact checks: ${mix.slice(0,3).join(' ') || 'topic'}`,
+      url: `https://www.politifact.com/search/?q=${q}`,
+      reliability_score: 90,
+      reason: 'Recognized political fact-checker; cites primary sources; HTTPS',
+      evidence_snippet: null,
+      type: 'secondary'
+    });
+  }
+  if (topics.has('health')) {
+    suggestions.push({
+      title: `WHO info: ${mix.slice(0,3).join(' ') || 'topic'}`,
+      url: `https://www.who.int/search?q=${q}`,
+      reliability_score: 92,
+      reason: 'Authoritative health guidance; primary reports; HTTPS',
+      evidence_snippet: null,
+      type: 'secondary'
+    });
+    suggestions.push({
+      title: `PubMed studies: ${mix.slice(0,3).join(' ') || 'topic'}`,
+      url: `https://pubmed.ncbi.nlm.nih.gov/?term=${q}`,
+      reliability_score: 93,
+      reason: 'Peer-reviewed literature index; links to DOIs; HTTPS',
+      evidence_snippet: null,
+      type: 'primary'
+    });
+  }
   const strong = false; // no live corroboration locally
   return { suggestions, strong };
 }
