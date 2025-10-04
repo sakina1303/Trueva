@@ -63,7 +63,12 @@ const TIER50 = [
 
 function hostMatches(list, host) {
   if (!host) return false;
-  return list.some(d => host === d || host.endsWith('.' + d));
+  return list.some(d => {
+    if (host === d) return true;
+    if (host.endsWith('.' + d)) return true;
+    // Permissive match: if host contains the domain with a boundary (e.g., foo-bbc.com should NOT match 'bbc.com')
+    return host.includes('.' + d) || host.includes(d + '.');
+  });
 }
 
 function detectLocalVerdict(text) {
@@ -203,41 +208,51 @@ export async function analyzeText(payload) {
     final = Math.min(final, 5);
     notices.push('Authoritative fact-check indicates TRUE; authenticity boosted.');
   }
+  // Track whether domain logic has applied a cap/floor
+  let domainHandled = isFactChecker && positiveVerdict ? true : false;
   // Default trust for Snopes when verdict not detected as negative
   if (host === 'snopes.com' && !negativeVerdict) {
     final = Math.min(final, 5);
+    domainHandled = true;
     if (!positiveVerdict) notices.push('Trusted fact-check domain detected (Snopes); defaulting to high authenticity.');
   }
   if (host === 'snopes.com' && negativeVerdict) {
     final = Math.max(final, 85); // high suspicion for FALSE verdict on Snopes
     notices.push('Snopes indicates FALSE; raising suspicion.');
+    domainHandled = true;
   }
 
   // Trusted mainstream news domains: default to high authenticity unless explicit negative verdict found
-  if (isHostTrusted(host) && !negativeVerdict) {
+  if (!domainHandled && isHostTrusted(host) && !negativeVerdict) {
     final = Math.min(final, 10); // authenticity ≥ 90%
     notices.push('Trusted major news domain detected; defaulting to high authenticity.');
+    domainHandled = true;
   }
 
-  // Domain authenticity tiers (only if no explicit negative verdict)
-  if (!negativeVerdict) {
+  // Domain authenticity tiers (only if no explicit negative verdict and not already handled)
+  if (!negativeVerdict && !domainHandled) {
     if (hostMatches(TIER80, host)) {
       final = Math.min(final, 20); // authenticity ≥ 80%
       notices.push('Tier: 80%+ Authentic domain.');
+      domainHandled = true;
     } else if (hostMatches(TIER70, host)) {
       final = Math.min(final, 30); // authenticity ≥ 70%
       notices.push('Tier: 70%+ Authentic domain.');
+      domainHandled = true;
     } else if (hostMatches(TIER60, host)) {
       final = Math.min(final, 40); // authenticity ≥ 60%
       notices.push('Tier: 60%+ Authentic domain.');
+      domainHandled = true;
     } else if (hostMatches(TIER50, host)) {
       final = Math.min(final, 50); // authenticity ≥ 50%
       notices.push('Tier: 50%+ Authentic domain.');
-    } else {
-      // Default others to <50% authenticity
-      final = Math.max(final, 50); // authenticity ≤ 50%
-      notices.push('Domain not in tiers; defaulting to ≤50% authenticity.');
+      domainHandled = true;
     }
+  }
+  // Default others: only apply if nothing else handled and no explicit negative verdict
+  if (!negativeVerdict && !domainHandled) {
+    final = Math.max(final, 50); // authenticity ≤ 50%
+    notices.push('Domain not in tiers; defaulting to ≤50% authenticity.');
   }
 
   // If Snopes provides a verdict and we can match a sentence, add a high-severity highlight
