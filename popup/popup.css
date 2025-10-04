@@ -1,48 +1,49 @@
 * { box-sizing: border-box; }
-body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; width: 360px; color: #111; }
-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-bottom: 1px solid #eee; }
-h1 { font-size: 16px; margin: 0; }
-.badge { background: #eef2ff; color: #1e40af; border-radius: 999px; padding: 4px 10px; font-weight: 600; }
+body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; width: 360px; color: #e6eefc; background: radial-gradient(1200px 600px at -10% -20%, #0f2453 0%, #0b1b3b 40%, #091632 100%); }
+header { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.06); background: rgba(8,17,35,0.6); backdrop-filter: blur(6px); }
+h1 { font-size: 16px; margin: 0; color: #eaf2ff; letter-spacing: 0.2px; }
+.badge { background: rgba(37,99,235,0.14); color: #cfe0ff; border: 1px solid rgba(99,102,241,0.4); border-radius: 999px; padding: 4px 10px; font-weight: 700; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04); }
 #controls { padding: 10px 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-button { padding: 8px 10px; border-radius: 8px; border: 1px solid #e5e7eb; background: white; cursor: pointer; font-weight: 600; }
-button:hover { background: #f9fafb; }
-.link { background: transparent; border: none; color: #2563eb; padding: 6px 8px; }
+button { padding: 9px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); background: linear-gradient(180deg,#163a7a,#1240af); color: #eaf2ff; cursor: pointer; font-weight: 700; letter-spacing: .2px; box-shadow: 0 6px 14px rgba(16, 55, 140, 0.25), inset 0 1px 0 rgba(255,255,255,0.08); transition: transform .06s ease, background .2s ease; }
+button:hover { background: linear-gradient(180deg,#1a4696,#1451d6); transform: translateY(-1px); }
+button:disabled { opacity: .6; cursor: not-allowed; }
+.link { background: transparent; border: none; color: #8bb6ff; padding: 6px 8px; }
 .hidden { display: none; }
 #results { padding: 8px 12px 12px; }
 .score-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.label { color: #6b7280; font-size: 12px; margin-right: 6px; }
-.score { font-weight: 800; font-size: 18px; }
-.bias { font-weight: 600; }
+.label { color: #9db2d9; font-size: 12px; margin-right: 6px; }
+.score { font-weight: 900; font-size: 20px; text-shadow: 0 1px 0 rgba(0,0,0,0.25); }
+.bias { font-weight: 700; }
 .flags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
-.flag { border-radius: 999px; padding: 4px 8px; font-size: 12px; border: 1px solid #e5e7eb; background: #f9fafb; }
-.panel { border-top: 1px solid #eee; padding-top: 8px; margin-top: 8px; }
-.panel h3 { font-size: 13px; margin: 6px 0; }
-.source { margin: 6px 0; font-size: 12px; }
-.source a { color: #2563eb; text-decoration: none; }
-footer { display: flex; justify-content: space-between; padding: 8px 12px; border-top: 1px solid #eee; }
+.flag { border-radius: 999px; padding: 4px 8px; font-size: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.06); color: #dbe8ff; }
+.panel { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 8px; margin-top: 8px; }
+.panel h3 { font-size: 13px; margin: 6px 0; color: #cfe0ff; letter-spacing: .2px; }
+.source { margin: 6px 0; font-size: 12px; color: #c7d6ff; }
+.source a { color: #8bb6ff; text-decoration: none; }
+footer { display: flex; justify-content: space-between; padding: 8px 12px; border-top: 1px solid rgba(255,255,255,0.06); background: rgba(8,17,35,0.6); backdrop-filter: blur(6px); }
 /* Score colors */
-.score.green { color: #15803d; }
-.score.yellow { color: #a16207; }
-.score.red { color: #b91c1c; }
+.score.green { color: #5ee599; }
+.score.yellow { color: #facc15; }
+.score.red { color: #fb7185; }
 
 /* Offline */
-.offline { background: #fff7ed; color: #9a3412; border: 1px solid #fed7aa; padding: 6px 8px; border-radius: 8px; margin: 6px 0; font-size: 12px; }
+.offline { background: rgba(250, 204, 21, 0.12); color: #fde68a; border: 1px solid rgba(250, 204, 21, 0.35); padding: 6px 8px; border-radius: 8px; margin: 6px 0; font-size: 12px; }
 
 /* Bias meter */
 .bias-wrap { display: flex; align-items: center; gap: 6px; }
-.bias-meter { position: relative; width: 140px; height: 8px; background: linear-gradient(90deg, #60a5fa, #9ca3af, #f59e0b); border-radius: 999px; overflow: hidden; border: 1px solid #e5e7eb; }
-.bias-pointer { position: absolute; top: -4px; width: 2px; height: 16px; background: #111; left: 50%; transition: left 0.25s ease; }
-.bias-conf { color: #6b7280; font-size: 12px; }
+.bias-meter { position: relative; width: 140px; height: 8px; background: linear-gradient(90deg, #60a5fa, #9ca3af, #f59e0b); border-radius: 999px; overflow: hidden; border: 1px solid rgba(255,255,255,0.12); box-shadow: inset 0 0 8px rgba(0,0,0,0.35); }
+.bias-pointer { position: absolute; top: -4px; width: 2px; height: 16px; background: #e6eefc; left: 50%; transition: left 0.25s ease; box-shadow: 0 0 0 1px rgba(0,0,0,0.3); }
+.bias-conf { color: #9db2d9; font-size: 12px; }
 
 /* Details */
 details.panel { padding-top: 4px; }
-details.panel > summary { cursor: pointer; list-style: none; font-weight: 600; font-size: 13px; }
+details.panel > summary { cursor: pointer; list-style: none; font-weight: 700; font-size: 13px; color: #cfe0ff; }
 details.panel > summary::-webkit-details-marker { display: none; }
 
 /* Feedback */
 .feedback { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
-.small { padding: 4px 8px; border-radius: 6px; border: 1px solid #e5e7eb; background: #f9fafb; font-size: 12px; cursor: pointer; }
-.community { color: #6b7280; font-size: 12px; }
+.small { padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.06); color: #dbe8ff; font-size: 12px; cursor: pointer; }
+.community { color: #9db2d9; font-size: 12px; }
 
 @media (max-width: 360px) {
   body { width: 320px; }

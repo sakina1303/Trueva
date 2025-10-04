@@ -15,7 +15,7 @@ function quickInitialScore(text) {
   if (/\b(always|never|everyone|no one)\b/i.test(text)) s += 10;
   if (/(\b\d{2,}%\b|\b\d{4,}\b)/.test(text)) s += 5;
   if (/[A-Z]{5,}/.test(text)) s += 5;
-  return Math.max(0, Math.min(100, s));
+  return Math.max(0, Math.min(100,s));
 }
 
 function getHost(u) { try { return new URL(u).hostname.replace(/^www\./,''); } catch { return ''; } }
