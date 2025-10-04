@@ -1,0 +1,2 @@
+.fnf-highlight { background: linear-gradient(transparent 60%, rgba(251, 191, 36, 0.6) 60%); padding: 0 0.1em; }
+.fnf-hide-highlights .fnf-highlight { background: transparent !important; }

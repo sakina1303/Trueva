@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fake News Filter</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Fake News Filter</h1>
+      <div id="badge" class="badge">--%</div>
+    </header>
+
+    <section id="controls">
+      <button id="scanPage">Scan Full Page</button>
+      <button id="scanSelection">Scan Selection</button>
+    </section>
+
+    <section id="results" class="hidden">
+      <div class="score-row">
+        <div>
+          <span class="label">Authenticity Score</span>
+          <span id="score" class="score">--%</span>
+        </div>
+        <div>
+          <span class="label">Bias</span>
+          <span id="bias" class="bias">--</span>
+        </div>
+      </div>
+      <div id="flags" class="flags"></div>
+      <div id="highlightsPanel" class="panel"></div>
+      <div id="sources" class="panel"></div>
+      <div id="explainability" class="panel"></div>
+    </section>
+
+    <footer>
+      <button id="toggleHighlights" class="link">Toggle Highlights</button>
+      <button id="save" class="link">Save to history</button>
+    </footer>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>
