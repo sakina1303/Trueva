@@ -7,14 +7,22 @@
     <link rel="stylesheet" href="options.css" />
   </head>
   <body>
-    <main>
-      <h1>Fake News Filter – Settings</h1>
+    <div class="wrap">
+      <h1>Fake News Filter — Options</h1>
 
       <section>
         <h2>External Fact-Check (Opt-in)</h2>
-        <label class="row">
-          <input type="checkbox" id="optIn" /> Enable Snopes fact-check lookups (privacy-friendly; sends paraphrased headline/claim only)
-        </label>
+        <div class="row">
+          <label>
+            <input type="checkbox" id="snopesOptIn" /> Enable external fact-check lookups (Snopes)
+          </label>
+        </div>
+        <div class="row">
+          <label>
+            <input type="checkbox" id="aiEnabled" /> Enable AI-assisted analysis (keeps rule-based as primary)
+          </label>
+          <div class="hint">Adds lightweight on-device AI signals to refine highlights and weights. No data leaves your device.</div>
+        </div>
         <label class="row">
           Snopes API Key
           <input type="password" id="apiKey" placeholder="Enter API key" />
@@ -26,7 +34,6 @@
         <div class="hint">We never send full article text. We paraphrase key claims. Data is cached locally to reduce requests.</div>
         <div class="actions">
           <button id="save">Save</button>
-          <span id="status" class="status"></span>
         </div>
       </section>
 

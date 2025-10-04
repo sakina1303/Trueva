@@ -11,12 +11,14 @@ async function load() {
   els.optIn.checked = !!settings.snopesOptIn;
   els.apiKey.value = settings.snopesApiKey || '';
   els.apiBase.value = settings.snopesApiBase || 'https://api.snopes.com/fact-check';
+  document.getElementById('aiEnabled').checked = !!settings.aiEnabled;
 }
 
 async function save() {
   const settings = {
     ...((await chrome.storage.local.get('settings')).settings || {}),
     snopesOptIn: !!els.optIn.checked,
+    aiEnabled: !!document.getElementById('aiEnabled').checked,
     snopesApiKey: els.apiKey.value.trim(),
     snopesApiBase: els.apiBase.value.trim() || 'https://api.snopes.com/fact-check'
   };

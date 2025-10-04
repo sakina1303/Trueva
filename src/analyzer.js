@@ -1,5 +1,6 @@
 import { scoreReliability, suggestSources, makeSearchQueries } from './sources.js';
 import { detectBias, lexicalBias } from './scoring.js';
+import { predictClaimLikeness, predictSensational, ensureModelsLoaded } from './ml/loader.js';
 import { snopesLookup } from './snopes.js';
 import { detectDomainBias, combineBiasSignals } from './bias-detector.js';
 import { extractEntities } from './entity-extractor.js';
@@ -135,6 +136,12 @@ function finalScore(initial, text, flags, biasScore, snopesVerdict) {
 
 export async function analyzeText(payload) {
   const { text, url = '', title = '', mode = 'page', meta = {} } = payload;
+  // Load settings to see if AI is enabled
+  let aiEnabled = false;
+  try {
+    const { settings = {} } = await chrome.storage.local.get('settings');
+    aiEnabled = !!settings.aiEnabled;
+  } catch {}
   const ctxParts = [text || ''];
   if (meta?.surrounding?.before) ctxParts.push(meta.surrounding.before);
   if (meta?.surrounding?.after) ctxParts.push(meta.surrounding.after);
@@ -142,12 +149,41 @@ export async function analyzeText(payload) {
   if (meta?.headline) ctxParts.push(meta.headline);
   const contextText = ctxParts.join(' \n ');
   const initial = quickInitialScore(text);
-  const highlights = findHighlights(text);
+  let highlights = findHighlights(text);
   const flags = aggregateFlags(highlights);
   // Bias: combine domain-based (AllSides-like) with lexical (use context for selections)
   const domainB = detectDomainBias(url);
   const lexB = lexicalBias(mode === 'selection' ? contextText : text);
   const bias = combineBiasSignals(domainB, lexB);
+
+  // Optional AI assist: claim-likeness and sensational tone
+  let aiClaimScores = null;
+  let aiSensScore = null;
+  if (aiEnabled) {
+    try {
+      await ensureModelsLoaded();
+      const sentences = (text || '').split(/(?<=[.!?])\s+/).filter(Boolean).slice(0, 100);
+      aiClaimScores = sentences.length ? await predictClaimLikeness(sentences) : null;
+      aiSensScore = (await predictSensational([contextText]))?.[0] ?? null;
+      // Re-rank highlights by claim-likeness where possible
+      if (aiClaimScores && aiClaimScores.length) {
+        const idxOf = (span) => {
+          const i = (text || '').indexOf(span);
+          if (i < 0) return -1;
+          // Map to sentence index
+          let pos = 0; let si = -1;
+          const ss = (text || '').split(/(?<=[.!?])\s+/);
+          for (let k=0;k<ss.length;k++){ const seg = ss[k]; if (i >= pos && i < pos + seg.length + 1) { si = k; break; } pos += seg.length + 1; }
+          return si;
+        };
+        highlights = highlights.map(h => {
+          const si = idxOf(h.span);
+          const score = (si >= 0 && aiClaimScores[si] != null) ? aiClaimScores[si] : 0.5;
+          return { ...h, aiClaim: score };
+        }).sort((a,b)=> (b.aiClaim||0) - (a.aiClaim||0));
+      }
+    } catch {}
+  }
 
   // Entities for better suggestions
   const entities = extractEntities(mode === 'selection' ? contextText : text);
@@ -189,8 +225,16 @@ export async function analyzeText(payload) {
     }
     final = Math.max(0, Math.min(100, Math.round(final)));
   }
+  // Apply AI-influenced adjustments (very small, bounded), then citation/temporal
+  if (aiEnabled && aiSensScore != null) {
+    const delta = Math.max(-5, Math.min(5, Math.round((aiSensScore - 0.5) * 10)));
+    final = Math.min(100, Math.max(0, final + delta));
+  }
+  const citeFactor = (aiEnabled && aiClaimScores && aiClaimScores.length)
+    ? (0.8 + 0.4 * (aiClaimScores.reduce((a,b)=>a+b,0) / aiClaimScores.length))
+    : 1.0;
   // Apply citation and temporal risk adjustments (modest influence)
-  final = Math.min(100, Math.max(0, Math.round(final + (citations.citationRisk || 0) * 0.15 + (temporal.temporalRisk || 0) * 0.1)));
+  final = Math.min(100, Math.max(0, Math.round(final + (citations.citationRisk || 0) * 0.15 * citeFactor + (temporal.temporalRisk || 0) * 0.1)));
 
   let notices = [];
   if (selection && len < 80) {
