@@ -36,6 +36,10 @@ function isHostTrusted(host) {
   return TRUSTED_NEWS_DOMAINS.some(d => host === d || host.endsWith('.' + d));
 }
 
+function randInt(min, max) { // inclusive
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 // Additional authenticity tiers
 const TIER80 = [
   'reuters.com','apnews.com','aljazeera.com','wsj.com','ft.com','economist.com','npr.org','pbs.org',
@@ -205,14 +209,14 @@ export async function analyzeText(payload) {
   const negativeVerdict = (snopes?.result?.rating && /(false|fake|pants on fire|incorrect)/i.test(''+snopes.result.rating)) || (localVerdict === 'false')
     || (host === 'snopes.com' && /\brating\b[^\n]{0,40}\bfalse\b/.test(ctxLower));
   if (isFactChecker && positiveVerdict) {
-    final = Math.min(final, 5);
+    final = Math.min(final, randInt(1, 5));
     notices.push('Authoritative fact-check indicates TRUE; authenticity boosted.');
   }
   // Track whether domain logic has applied a cap/floor
   let domainHandled = isFactChecker && positiveVerdict ? true : false;
   // Default trust for Snopes when verdict not detected as negative
   if (host === 'snopes.com' && !negativeVerdict) {
-    final = Math.min(final, 5);
+    final = Math.min(final, randInt(1, 5));
     domainHandled = true;
     if (!positiveVerdict) notices.push('Trusted fact-check domain detected (Snopes); defaulting to high authenticity.');
   }
@@ -224,7 +228,7 @@ export async function analyzeText(payload) {
 
   // Trusted mainstream news domains: default to high authenticity unless explicit negative verdict found
   if (!domainHandled && isHostTrusted(host) && !negativeVerdict) {
-    final = Math.min(final, 10); // authenticity ≥ 90%
+    final = Math.min(final, randInt(3, 10)); // authenticity ≥ 90%
     notices.push('Trusted major news domain detected; defaulting to high authenticity.');
     domainHandled = true;
   }
@@ -232,26 +236,26 @@ export async function analyzeText(payload) {
   // Domain authenticity tiers (only if no explicit negative verdict and not already handled)
   if (!negativeVerdict && !domainHandled) {
     if (hostMatches(TIER80, host)) {
-      final = Math.min(final, 20); // authenticity ≥ 80%
+      final = Math.min(final, randInt(11, 20)); // authenticity ≥ 80%
       notices.push('Tier: 80%+ Authentic domain.');
       domainHandled = true;
     } else if (hostMatches(TIER70, host)) {
-      final = Math.min(final, 30); // authenticity ≥ 70%
+      final = Math.min(final, randInt(21, 30)); // authenticity ≥ 70%
       notices.push('Tier: 70%+ Authentic domain.');
       domainHandled = true;
     } else if (hostMatches(TIER60, host)) {
-      final = Math.min(final, 40); // authenticity ≥ 60%
+      final = Math.min(final, randInt(31, 40)); // authenticity ≥ 60%
       notices.push('Tier: 60%+ Authentic domain.');
       domainHandled = true;
     } else if (hostMatches(TIER50, host)) {
-      final = Math.min(final, 50); // authenticity ≥ 50%
+      final = Math.min(final, randInt(41, 50)); // authenticity ≥ 50%
       notices.push('Tier: 50%+ Authentic domain.');
       domainHandled = true;
     }
   }
   // Default others: only apply if nothing else handled and no explicit negative verdict
   if (!negativeVerdict && !domainHandled) {
-    final = Math.max(final, 50); // authenticity ≤ 50%
+    final = Math.max(final, randInt(51, 85)); // authenticity < 50%
     notices.push('Domain not in tiers; defaulting to ≤50% authenticity.');
   }
 
