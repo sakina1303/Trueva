@@ -1,4 +1,4 @@
-# Fake News Filter (Prototype)
+# Trueva
 
 A Chrome extension that analyzes news articles or selected text to highlight potential misinformation patterns, provide an authenticity score, bias meter, and reputable source suggestions.
 
